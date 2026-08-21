@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button"
+import { Show, SignInButton, UserButton } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -38,7 +39,13 @@ function Header() {
         ))}
     </div>
     {/* Get Started Button */}
-    <Button>Get Started</Button>
+    <Show when="signed-in" fallback={
+      <SignInButton mode="modal">
+        <Button>Get Started</Button>
+      </SignInButton>
+    }>
+      <UserButton />
+    </Show>
 
    </div>
   )
