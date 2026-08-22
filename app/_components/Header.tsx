@@ -1,5 +1,6 @@
+'use client'
 import { Button } from "@/components/ui/button"
-import { Show, SignInButton, UserButton } from "@clerk/nextjs"
+import { SignInButton, useUser } from "@clerk/nextjs"
 import Image from "next/image"
 import Link from "next/link"
 
@@ -22,6 +23,7 @@ const menuOptions = [
 
 
 function Header() {
+const {user}= useUser();
   return (
    <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-4">
     {/* Logo */}
@@ -38,14 +40,13 @@ function Header() {
             </Link>
         ))}
     </div>
-    {/* Get Started Button */}
-    <Show when="signed-in" fallback={
-      <SignInButton mode="modal">
+    {/* Get Started Button  */}
+    {!user ? <SignInButton mode='modal'>
         <Button>Get Started</Button>
-      </SignInButton>
-    }>
-      <UserButton />
-    </Show>
+    </SignInButton> :
+        <Link href={'/create-trip'}>
+            <Button>Create New trip</Button>
+        </Link>}
 
    </div>
   )
