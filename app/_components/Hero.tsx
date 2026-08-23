@@ -6,24 +6,24 @@ import { useUser } from "@clerk/nextjs";
 import { ArrowDown, Globe2, Landmark, Plane, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const suggestions = [
+export const suggestions = [
   {
     title: "Create a New Trip",
-    icon: <Globe2 className="text-blue-400 h-4 w-4 group-hover:text-white" />,
+    icon: <Globe2 className="text-blue-400 h-5 w-5 group-hover:text-white" />,
   },
   {
     title: "Inspire me where to go",
-    icon: <Plane className="text-green-500 h-4 w-4 group-hover:text-white" />,
+    icon: <Plane className="text-green-500 h-5 w-5 group-hover:text-white" />,
   },
   {
     title: "Discover Hidden gems",
     icon: (
-      <Landmark className="text-orange-500 h-4 w-4 group-hover:text-white" />
+      <Landmark className="text-orange-500 h-5 w-5 group-hover:text-white" />
     ),
   },
   {
     title: "Adventure Destination",
-    icon: <Globe2 className="text-yellow-600 h-4 w-4 group-hover:text-white" />,
+    icon: <Globe2 className="text-yellow-600 h-5 w-5 group-hover:text-white" />,
   },
 ];
 
@@ -76,7 +76,7 @@ const Hero = () => {
               className="group flex items-center gap-2 border rounded-full p-2 cursor-pointer hover:bg-primary hover:text-white"
             >
               {suggestion.icon}
-              <h2 className="text-sm">{suggestion.title}</h2>
+              <h2 className="text-[0.85rem]">{suggestion.title}</h2>
             </div>
           ))}
         </div>
