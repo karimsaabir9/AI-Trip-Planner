@@ -36,6 +36,7 @@ const Hero = () => {
       return;
     }
     //Navigate to Create Trip Planner Web Page
+    router.push("/create-new-trip");
   };
   return (
     <div className="mt-24 w-full flex justify-center px-4">
