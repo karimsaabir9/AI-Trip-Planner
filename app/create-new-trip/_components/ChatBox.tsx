@@ -5,10 +5,15 @@ import axios from "axios";
 import { Loader, Send } from "lucide-react";
 import { useState } from "react";
 import EmptyBoxState from "./EmptyBoxState";
+import GroupSizeUi from "./GroupSizeUi";
+import BudgetUi from "./BudgetUi";
+import SelectDaysUi from "./SelectDaysUi";
+import FinalUi from "./FinalUi";
 
 type Message = {
   role: string;
   content: string;
+  ui?: string;
 };
 
 function ChatBox() {
@@ -16,13 +21,14 @@ function ChatBox() {
   const [userInput, setUserInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSend = async () => {
-    if (!userInput?.trim()) return;
+  const onSend = async (input?: string) => {
+    const text = input ?? userInput;
+    if (!text?.trim()) return;
     setLoading(true);
     setUserInput("");
     const newMsg: Message = {
       role: "user",
-      content: userInput,
+      content: text,
     };
     setMessages((prev: Message[]) => [...prev, newMsg]);
     const result = await axios.post("/api/aimodel", {
@@ -33,38 +39,72 @@ function ChatBox() {
       {
         role: "assistant",
         content: result?.data?.resp,
+        ui: result?.data?.ui,
       },
     ]);
     console.log(result.data);
     setLoading(false);
   };
+
+  const RenderGenerativeUi = (ui: string) => {
+    const uiKey = ui?.toLowerCase();
+    if (uiKey == "budget") {
+      //Budget UI Component
+      return (
+        <BudgetUi
+          onSelectedOption={(v: string) => onSend(v)}
+        />
+      );
+    } else if (uiKey == "groupsize") {
+      //Group Size UI Component
+      return (
+        <GroupSizeUi
+          onSelectedOption={(v: string) => onSend(v)}
+        />
+      );
+    } else if (uiKey == "tripduration") {
+      //Trip Duration UI Component
+      return (
+        <SelectDaysUi
+          onSelectedOption={(v: string) => onSend(v)}
+        />
+      );
+    } else if (uiKey == "final") {
+      //Final Trip UI Component
+      return <FinalUi viewTrip={() => {}} />;
+    }
+    return null;
+  };
+
   return (
     <div className="h-[85vh] flex flex-col">
       {messages?.length == 0 && (
-        <EmptyBoxState
-          onSelectOption={(v:string) => { 
-            setUserInput(v);
-            onSend();
-          }}
-        />
+        <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />
       )}
       {/* Display Messages */}
       <section className="flex-1 overflow-y-auto p-4">
-        {messages.map((msg: Message, index) =>
-          msg.role == "user" ? (
-            <div key={index} className="flex justify-end mt-2">
-              <div className="max-w-lg bg-primary text-white px-4 py-2 rounded-lg">
-                {msg.content}
+        {messages.map((msg: Message, index) => {
+          if (msg.role == "user") {
+            return (
+              <div key={index} className="flex justify-end mt-2">
+                <div className="max-w-lg bg-primary text-white px-4 py-2 rounded-lg">
+                  {msg.content}
+                </div>
               </div>
-            </div>
-          ) : (
+            );
+          }
+          const generativeUi = RenderGenerativeUi(msg.ui ?? "");
+          return (
             <div key={index} className="flex justify-start mt-2">
-              <div className="max-w-lg bg-gray-100 text-black px-4 py-2 rounded-lg">
+              <div
+                className={`${generativeUi ? "w-full" : ""} max-w-lg bg-gray-100 text-black px-4 py-2 rounded-lg`}
+              >
                 {msg.content}
+                {generativeUi}
               </div>
             </div>
-          ),
-        )}
+          );
+        })}
         {loading && (
           <div className="flex justify-start mt-2">
             <div className="max-w-lg bg-gray-100 text-black px-4 py-2 rounded-lg">
