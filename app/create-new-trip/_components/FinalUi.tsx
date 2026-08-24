@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Globe2 } from "lucide-react";
 
-function FinalUi({ viewTrip }: any) {
+function FinalUi({ viewTrip, disable }: any) {
   return (
     <div className="flex flex-col items-center justify-center mt-6 p-6 bg-white rounded-2xl shadow border">
       <Globe2 className="text-primary text-4xl animate-bounce" />
@@ -11,7 +11,7 @@ function FinalUi({ viewTrip }: any) {
       <p className="text-gray-500 text-sm text-center mt-1">
         Gathering best destinations, activities, and travel details for you.
       </p>
-      <Button disabled onClick={viewTrip} className="mt-2 w-full">
+      <Button disabled={disable} onClick={viewTrip} className="mt-2 w-full">
         View Trip
       </Button>
       {/* <div className="w-48 h-2 bg-gray-200 rounded-full mt-4 overflow-hidden">

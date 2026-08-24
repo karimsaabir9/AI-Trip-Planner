@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Loader, Send } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EmptyBoxState from "./EmptyBoxState";
 import GroupSizeUi from "./GroupSizeUi";
 import BudgetUi from "./BudgetUi";
@@ -16,14 +16,32 @@ type Message = {
   ui?: string;
 };
 
-function ChatBox() {
+export type TripInfo ={
+  budget: string;
+  destination: string;
+  duration: string;
+  group_size: string;
+  origin: string;
+  hotels: any;
+  itinerary: any;
+}
+
+type ChatBoxProps = {
+  onTripReady?: (trip: TripInfo) => void;
+  onViewTrip?: () => void;
+};
+
+function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [userInput, setUserInput] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
+  const [isFinal, setIsFinal] = useState<boolean>(false);
+  const [tripDetail, setTripDetail] = useState<TripInfo>();
 
-  const onSend = async (input?: string) => {
+  const onSend = async (input?: string, finalOverride?: boolean) => {
     const text = input ?? userInput;
     if (!text?.trim()) return;
+    const useFinal = finalOverride ?? isFinal;
     setLoading(true);
     setUserInput("");
     const newMsg: Message = {
@@ -33,16 +51,24 @@ function ChatBox() {
     setMessages((prev: Message[]) => [...prev, newMsg]);
     const result = await axios.post("/api/aimodel", {
       messages: [...messages, newMsg],
+      isFinal: useFinal,
     });
-    setMessages((prev: Message[]) => [
-      ...prev,
-      {
-        role: "assistant",
-        content: result?.data?.resp,
-        ui: result?.data?.ui,
-      },
-    ]);
-    console.log(result.data);
+    console.log("Trip", result.data);
+    !useFinal &&
+      setMessages((prev: Message[]) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: result?.data?.resp,
+          ui: result?.data?.ui,
+        },
+      ]);
+
+    if (useFinal) {
+      setTripDetail(result?.data?.trip_plan);
+      onTripReady?.(result?.data?.trip_plan);
+    }
+
     setLoading(false);
   };
 
@@ -50,31 +76,27 @@ function ChatBox() {
     const uiKey = ui?.toLowerCase();
     if (uiKey == "budget") {
       //Budget UI Component
-      return (
-        <BudgetUi
-          onSelectedOption={(v: string) => onSend(v)}
-        />
-      );
+      return <BudgetUi onSelectedOption={(v: string) => onSend(v)} />;
     } else if (uiKey == "groupsize") {
       //Group Size UI Component
-      return (
-        <GroupSizeUi
-          onSelectedOption={(v: string) => onSend(v)}
-        />
-      );
+      return <GroupSizeUi onSelectedOption={(v: string) => onSend(v)} />;
     } else if (uiKey == "tripduration") {
       //Trip Duration UI Component
-      return (
-        <SelectDaysUi
-          onSelectedOption={(v: string) => onSend(v)}
-        />
-      );
+      return <SelectDaysUi onSelectedOption={(v: string) => onSend(v)} />;
     } else if (uiKey == "final") {
       //Final Trip UI Component
-      return <FinalUi viewTrip={() => {}} />;
+      return <FinalUi viewTrip={() => onViewTrip?.()} disable={!tripDetail} />;
     }
     return null;
   };
+
+  useEffect(() => {
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg?.ui == "final") {
+      setIsFinal(true);
+      onSend("Ok, Great!", true);
+    }
+  }, [messages]);
 
   return (
     <div className="h-[85vh] flex flex-col">

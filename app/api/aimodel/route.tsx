@@ -18,23 +18,77 @@ Only ask questions about the following details in order, and wait for the user's
 
 Do not ask multiple questions at once, and never ask irrelevant questions. If any answer is missing or unclear, politely ask the user to clarify before proceeding. Always maintain a conversational, interactive style while asking questions.
 
-Important: Never repeat a question that has already been answered and confirmed. Track the user's collected answers/state throughout the conversation. After an answer is received, move directly to the next unanswered question. Do not reset the conversation state or start the question sequence from the beginning.
+Important: Never repeat a question that has already been answered and confirmed. If the user provides multiple details in a single message (e.g. "Kampala to Mogadishu, 3 Days" answers source, destination, AND trip duration at once), treat all of them as answered immediately and do not ask about any of them again. Track the user's collected answers/state throughout the conversation. After an answer is received, move directly to the next unanswered question. Do not reset the conversation state or start the question sequence from the beginning.
 
 Along with the response, also send which UI component should be displayed for the Generative UI, for example:
 
 budget / groupSize / tripDuration / final
+
+The "ui" value must always match the question you are actually asking in "resp" right now — never the previous question, even if that question was answered in an earlier turn instead of the expected order. For example, once trip duration has been answered, never send ui:'tripDuration' again, even when the current question is about something else. Use "none" as the ui value when the current question has no matching generative UI component (source, destination, interests, requirements).
 
 Where final means the AI is generating the complete final trip output.
 
 Once all required information is collected, generate and return a strict JSON response only, with no explanations or extra text, using this schema:
 {
 resp:'Text Resp',
-ui:'budget/groupSize/tripDuration/final'
+ui:'budget/groupSize/tripDuration/none/final'
 }
 `;
 
+const FINAL_PROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName,
+Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and  suggest itinerary with placeName, Place Details, Place Image Url,
+ Geo Coordinates,Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
+ Output Schema:
+ {
+  "trip_plan": {
+    "destination": "string",
+    "duration": "string",
+    "origin": "string",
+    "budget": "string",
+    "group_size": "string",
+    "hotels": [
+      {
+        "hotel_name": "string",
+        "hotel_address": "string",
+        "price_per_night": "string",
+        "hotel_image_url": "string",
+        "geo_coordinates": {
+          "latitude": "number",
+          "longitude": "number"
+        },
+        "rating": "number",
+        "description": "string"
+      }
+    ],
+    "itinerary": [
+      {
+        "day": "number",
+        "day_plan": "string",
+        "best_time_to_visit_day": "string",
+        "activities": [
+          {
+            "place_name": "string",
+            "place_details": "string",
+            "place_image_url": "string",
+            "geo_coordinates": {
+              "latitude": "number",
+              "longitude": "number"
+            },
+            "place_address": "string",
+            "ticket_pricing": "string",
+            "time_travel_each_location": "string",
+            "best_time_to_visit": "string"
+          }
+        ]
+      }
+    ]
+  }
+}
+
+`;
+
 export async function POST(req: NextRequest) {
-  const { messages } = await req.json();
+  const { messages, isFinal } = await req.json();
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-5.4-mini",
@@ -42,7 +96,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "system",
-          content: PROMPT,
+          content: isFinal ? FINAL_PROMPT : PROMPT,
         },
         ...messages,
       ],
