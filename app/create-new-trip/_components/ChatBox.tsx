@@ -12,7 +12,7 @@ import FinalUi from "./FinalUi";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useUserDetail } from "@/app/Provider";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 
 type Message = {
   role: string;
@@ -26,9 +26,45 @@ export type TripInfo = {
   duration: string;
   group_size: string;
   origin: string;
-  hotels: any;
-  itinerary: any;
+  hotels: Hotel[];
+  itinerary: Itinerary[];
 };
+
+export type Hotel = {
+  hotel_name: string;
+  hotel_address: string;
+  price_per_night: string;
+  hotel_image_url: string;
+  geo_coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  rating: number;
+  description: string;
+};
+
+
+type Activity = {
+  place_name: string;
+  place_details: string;
+  place_image_url: string;
+  geo_coordinates: {
+    latitude: number;
+    longitude: number;
+  }
+  place_address: string;
+  ticket_pricing: string;
+  time_travel_each_location: string;
+  best_time_to_visit: string;
+}
+
+
+type Itinerary ={
+  day: number;
+  day_plan: string;
+  best_time_to_visit_day: string;
+  activities: Activity[];
+}
 
 type ChatBoxProps = {
   onTripReady?: (trip: TripInfo) => void;
