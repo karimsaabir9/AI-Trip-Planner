@@ -1,6 +1,5 @@
 "use client";
 import Header from "./_components/Header";
-import Footer from "./_components/Footer";
 import { api } from "@/convex/_generated/api";
 import { useMutation } from "convex/react";
 import { useUser } from "@clerk/nextjs";
@@ -36,7 +35,6 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
       <div>
         <Header />
         {children}
-        <Footer />
       </div>
       </TripDetailContext.Provider>
     </UserDetailContext.Provider>

@@ -173,7 +173,7 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
   }, [messages]);
 
   return (
-    <div className="h-[85vh] flex flex-col">
+    <div className="h-[85vh] flex flex-col border shadow rounded-2xl p-5">
       {messages?.length == 0 && (
         <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />
       )}
@@ -210,22 +210,20 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
         )}
       </section>
       {/* User Input */}
-      <section>
-        <div className="border rounded-2xl p-4 relative">
-          <Textarea
-            placeholder="Start typing here..."
-            className="w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none"
-            onChange={(e) => setUserInput(e.target.value)}
-            value={userInput}
-          />
-          <Button
-            size={"icon"}
-            className="absolute bottom-6 right-6"
-            onClick={() => onSend()}
-          >
-            <Send className="h-4 w-4" />
-          </Button>
-        </div>
+      <section className="relative shrink-0 min-h-28 rounded-2xl bg-white border border-gray-300 p-2">
+        <Textarea
+          placeholder="Start typing here..."
+          className="w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none"
+          onChange={(e) => setUserInput(e.target.value)}
+          value={userInput}
+        />
+        <Button
+          size={"icon"}
+          className="absolute bottom-3 right-3 shadow-md"
+          onClick={() => onSend()}
+        >
+          <Send className="h-4 w-4" />
+        </Button>
       </section>
     </div>
   );

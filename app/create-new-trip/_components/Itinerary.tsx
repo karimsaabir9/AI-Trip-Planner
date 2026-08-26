@@ -1,7 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Timeline } from "@/components/ui/timeline";
-import { Clock, ExternalLink, Star, Ticket, Timer, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  Clock,
+  ExternalLink,
+  Star,
+  Ticket,
+  Timer,
+  Wallet,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import HotelCardItem from "./HotelCardItem";
@@ -218,7 +226,22 @@ function Itinerary() {
   return (
     <div className="relative w-full h-[83vh] overflow-auto ">
       {/* @ts-ignore */}
-      {tripData && <Timeline data={data} tripData={tripData} />}
+      {tripData ? (
+        <Timeline data={data} tripData={tripData} />
+      ) : (
+        <div>
+          <h2 className="flex gap-2 items-center absolute bottom-5 left-5 text-3xl text-white">
+            <ArrowLeft /> Getting to know you to build perfect trip here...
+          </h2>
+          <Image
+            src="/placeholders/travel.png"
+            alt="travel"
+            width={"800"}
+            height={"800"}
+            className="w-full h-full object-cover rounded-3xl"
+          />
+        </div>
+      )}
     </div>
   );
 }
