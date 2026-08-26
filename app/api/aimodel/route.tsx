@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { aj } from "../arcjet/route";
+import { currentUser } from "@clerk/nextjs/server";
 
 export const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -92,6 +94,19 @@ Important: Prefer real, well-known, easily-recognizable hotels and points of int
 
 export async function POST(req: NextRequest) {
   const { messages, isFinal, answeredFields } = await req.json();
+  const user = await currentUser();
+  const decision = await aj.protect(req, {
+    userId: user?.primaryEmailAddress?.emailAddress ?? "",
+    requested: isFinal ? 5 : 0,
+  }); // Deduct 5 tokens from the bucket
+
+  if (decision.isDenied()) {
+    return NextResponse.json({
+      resp: "NO Free Credit Remaining",
+      ui: "limit",
+    });
+  }
+
   const answeredNote =
     !isFinal && answeredFields?.length
       ? `\n\nThe user has ALREADY confirmed the following details in this conversation: ${answeredFields.join(", ")}. Do NOT ask about these again under any circumstances, even in rephrased form. Skip directly to asking about the next unanswered item in the list.`
