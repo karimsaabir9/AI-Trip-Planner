@@ -11,7 +11,7 @@ import SelectDaysUi from "./SelectDaysUi";
 import FinalUi from "./FinalUi";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
-import { useUserDetail } from "@/app/Provider";
+import { useTripDetail, useUserDetail } from "@/app/Provider";
 import { v4 as uuidv4 } from "uuid";
 
 type Message = {
@@ -19,6 +19,24 @@ type Message = {
   content: string;
   ui?: string;
 };
+
+const UI_TO_FIELD: Record<string, string> = {
+  budget: "budget",
+  groupsize: "group size",
+  tripduration: "trip duration (number of days)",
+};
+
+function getAnsweredFields(msgs: Message[]): string[] {
+  const answered = new Set<string>();
+  msgs.forEach((m, i) => {
+    if (m.role !== "assistant" || !m.ui) return;
+    const field = UI_TO_FIELD[m.ui.toLowerCase()];
+    if (!field) return;
+    const hasLaterUserMsg = msgs.slice(i + 1).some((mm) => mm.role === "user");
+    if (hasLaterUserMsg) answered.add(field);
+  });
+  return Array.from(answered);
+}
 
 export type TripInfo = {
   budget: string;
@@ -44,7 +62,7 @@ export type Hotel = {
 };
 
 
-type Activity = {
+export type Activity = {
   place_name: string;
   place_details: string;
   place_image_url: string;
@@ -59,7 +77,7 @@ type Activity = {
 }
 
 
-type Itinerary ={
+export type Itinerary ={
   day: number;
   day_plan: string;
   best_time_to_visit_day: string;
@@ -79,6 +97,7 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
   const [tripDetail, setTripDetail] = useState<TripInfo>();
   const SaveTripDetail = useMutation(api.tripDetail.CreateTripDetail);
   const { userDetail } = useUserDetail();
+  const { tripDetailInfo, setTripDetailInfo } = useTripDetail() || {};
 
   const onSend = async (input?: string, finalOverride?: boolean) => {
     const text = input ?? userInput;
@@ -91,9 +110,11 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
       content: text,
     };
     setMessages((prev: Message[]) => [...prev, newMsg]);
+    const updatedMessages = [...messages, newMsg];
     const result = await axios.post("/api/aimodel", {
-      messages: [...messages, newMsg],
+      messages: updatedMessages,
       isFinal: useFinal,
+      answeredFields: getAnsweredFields(updatedMessages),
     });
     console.log("Trip", result.data);
     !useFinal &&
@@ -108,6 +129,7 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
 
     if (useFinal) {
       setTripDetail(result?.data?.trip_plan);
+      setTripDetailInfo?.(result?.data?.trip_plan);
       onTripReady?.(result?.data?.trip_plan);
       const tripId = uuidv4();
       await SaveTripDetail({
@@ -120,8 +142,12 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
     setLoading(false);
   };
 
-  const RenderGenerativeUi = (ui: string) => {
+  const RenderGenerativeUi = (ui: string, index: number) => {
     const uiKey = ui?.toLowerCase();
+    const field = UI_TO_FIELD[uiKey];
+    if (field && getAnsweredFields(messages.slice(0, index)).includes(field)) {
+      return null;
+    }
     if (uiKey == "budget") {
       //Budget UI Component
       return <BudgetUi onSelectedOption={(v: string) => onSend(v)} />;
@@ -163,7 +189,7 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
               </div>
             );
           }
-          const generativeUi = RenderGenerativeUi(msg.ui ?? "");
+          const generativeUi = RenderGenerativeUi(msg.ui ?? "", index);
           return (
             <div key={index} className="flex justify-start mt-2">
               <div

@@ -38,6 +38,9 @@ ui:'budget/groupSize/tripDuration/none/final'
 const FINAL_PROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName,
 Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and  suggest itinerary with placeName, Place Details, Place Image Url,
  Geo Coordinates,Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
+
+Important: Prefer real, well-known, easily-recognizable hotels and points of interest (major chains, landmark hotels, famous attractions) over obscure or invented names, whenever suitable options exist for the destination. Real, famous places are far more likely to have publicly available photos, so favor them over generic or fictional-sounding names when choosing what to recommend.
+
  Output Schema:
  {
   "trip_plan": {
@@ -88,7 +91,11 @@ Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and
 `;
 
 export async function POST(req: NextRequest) {
-  const { messages, isFinal } = await req.json();
+  const { messages, isFinal, answeredFields } = await req.json();
+  const answeredNote =
+    !isFinal && answeredFields?.length
+      ? `\n\nThe user has ALREADY confirmed the following details in this conversation: ${answeredFields.join(", ")}. Do NOT ask about these again under any circumstances, even in rephrased form. Skip directly to asking about the next unanswered item in the list.`
+      : "";
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-5.4-mini",
@@ -96,7 +103,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: "system",
-          content: isFinal ? FINAL_PROMPT : PROMPT,
+          content: (isFinal ? FINAL_PROMPT : PROMPT) + answeredNote,
         },
         ...messages,
       ],

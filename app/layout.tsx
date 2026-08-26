@@ -15,7 +15,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <ClerkProvider>
     <html lang="en">
-      <body className={`${outfit.className} min-h-full flex flex-col`}>
+      <body className={`${outfit.className} min-h-full flex flex-col`} suppressHydrationWarning>
         <ConvexClientProvider>
           {children}
         </ConvexClientProvider>
