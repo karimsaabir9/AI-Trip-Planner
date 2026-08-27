@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { SignInButton, useClerk, useUser } from "@clerk/nextjs";
+import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
@@ -24,6 +25,7 @@ function Header() {
   const { user } = useUser();
   const { signOut, openUserProfile } = useClerk();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const initial = (
@@ -46,25 +48,35 @@ function Header() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto flex justify-between items-center px-4 py-4">
-      {/* Logo */}
-      <div className="flex gap-2 items-center">
-        <Image src="/logo.svg" alt="logo" width={30} height={36} />
-        <h2 className="font-bold text-2xl">AI Trip Planner</h2>
-      </div>
+    <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="flex justify-between items-center">
+        {/* Logo */}
+        <div className="flex gap-2 items-center">
+          <Image src="/logo.svg" alt="logo" width={30} height={36} />
+          <h2 className="font-bold text-xl sm:text-2xl">AI Trip Planner</h2>
+        </div>
 
-      {/* Menu Options */}
-      <div className="flex gap-8 items-center">
-        {menuOptions.map((menu, index) => (
-          <Link href={menu.path} key={index}>
-            <h2 className="text-lg hover:scale-105 transition-all hover:text-primary">
-              {menu.name}
-            </h2>
-          </Link>
-        ))}
-      </div>
-      {/* Get Started Button  */}
-      <div className="flex gap-5 items-center">
+        {/* Menu Options */}
+        <div className="hidden md:flex gap-8 items-center">
+          {menuOptions.map((menu, index) => (
+            <Link href={menu.path} key={index}>
+              <h2 className="text-lg hover:scale-105 transition-all hover:text-primary">
+                {menu.name}
+              </h2>
+            </Link>
+          ))}
+        </div>
+
+        {/* Mobile menu toggle */}
+        <button
+          className="md:hidden p-2"
+          onClick={() => setMobileNavOpen((v) => !v)}
+        >
+          {mobileNavOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        </button>
+
+        {/* Get Started Button  */}
+        <div className="hidden md:flex gap-5 items-center">
         {!user ? (
           <SignInButton mode="modal">
             <Button>Get Started</Button>
@@ -107,6 +119,58 @@ function Header() {
           </div>
         )}
         </div>
+      </div>
+
+      {/* Mobile menu panel */}
+      {mobileNavOpen && (
+        <div className="md:hidden flex flex-col gap-4 mt-4 pb-2">
+          {menuOptions.map((menu, index) => (
+            <Link
+              href={menu.path}
+              key={index}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <h2 className="text-lg hover:text-primary">{menu.name}</h2>
+            </Link>
+          ))}
+          {!user ? (
+            <SignInButton mode="modal">
+              <Button className="w-full">Get Started</Button>
+            </SignInButton>
+          ) : (
+            <>
+              <Link href={"/create-new-trip"} onClick={() => setMobileNavOpen(false)}>
+                <Button className="w-full">Create New trip</Button>
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center shrink-0">
+                  {initial}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <button
+                    onClick={() => {
+                      setMobileNavOpen(false);
+                      openUserProfile();
+                    }}
+                    className="text-left text-sm hover:text-primary"
+                  >
+                    Manage account
+                  </button>
+                  <button
+                    onClick={() => {
+                      setMobileNavOpen(false);
+                      signOut();
+                    }}
+                    className="text-left text-sm hover:text-primary"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
