@@ -80,7 +80,7 @@ function Header() {
             )}
           </div>
 
-          {user ? (
+          {user && (
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((v) => !v)}
@@ -102,28 +102,6 @@ function Header() {
                         {user?.primaryEmailAddress?.emailAddress}
                       </p>
                     </div>
-                  </div>
-
-                  <div className="md:hidden border-t my-1">
-                    {menuOptions.map((menu, index) => (
-                      <Link
-                        href={menu.path}
-                        key={index}
-                        onClick={() => setMenuOpen(false)}
-                      >
-                        <h2 className="px-4 py-2 text-sm hover:bg-gray-100">
-                          {menu.name}
-                        </h2>
-                      </Link>
-                    ))}
-                    <Link
-                      href={"/create-new-trip"}
-                      onClick={() => setMenuOpen(false)}
-                    >
-                      <h2 className="px-4 py-2 text-sm hover:bg-gray-100">
-                        Create New trip
-                      </h2>
-                    </Link>
                   </div>
 
                   <div className="border-t my-1">
@@ -149,23 +127,23 @@ function Header() {
                 </div>
               )}
             </div>
-          ) : (
-            <button
-              className="md:hidden p-2"
-              onClick={() => setMobileNavOpen((v) => !v)}
-            >
-              {mobileNavOpen ? (
-                <X className="h-6 w-6" />
-              ) : (
-                <Menu className="h-6 w-6" />
-              )}
-            </button>
           )}
+
+          <button
+            className="md:hidden p-2"
+            onClick={() => setMobileNavOpen((v) => !v)}
+          >
+            {mobileNavOpen ? (
+              <X className="h-6 w-6" />
+            ) : (
+              <Menu className="h-6 w-6" />
+            )}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu panel (signed-out users only) */}
-      {!user && mobileNavOpen && (
+      {/* Mobile nav panel */}
+      {mobileNavOpen && (
         <div className="md:hidden flex flex-col gap-4 mt-4 pb-2">
           {menuOptions.map((menu, index) => (
             <Link
@@ -176,9 +154,18 @@ function Header() {
               <h2 className="text-lg hover:text-primary">{menu.name}</h2>
             </Link>
           ))}
-          <SignInButton mode="modal">
-            <Button className="w-full">Get Started</Button>
-          </SignInButton>
+          {!user ? (
+            <SignInButton mode="modal">
+              <Button className="w-full">Get Started</Button>
+            </SignInButton>
+          ) : (
+            <Link
+              href={"/create-new-trip"}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <Button className="w-full">Create New trip</Button>
+            </Link>
+          )}
         </div>
       )}
     </div>
