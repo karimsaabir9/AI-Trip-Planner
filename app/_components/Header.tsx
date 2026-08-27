@@ -67,62 +67,105 @@ function Header() {
           ))}
         </div>
 
-        {/* Mobile menu toggle */}
-        <button
-          className="md:hidden p-2"
-          onClick={() => setMobileNavOpen((v) => !v)}
-        >
-          {mobileNavOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
-
-        {/* Get Started Button  */}
-        <div className="hidden md:flex gap-5 items-center">
-        {!user ? (
-          <SignInButton mode="modal">
-            <Button>Get Started</Button>
-          </SignInButton>
-        ) : (
-          <Link href={"/create-new-trip"}>
-            <Button>Create New trip</Button>
-          </Link>
-        )}
-        {user && (
-          <div className="relative" ref={menuRef}>
-            <button
-              onClick={() => setMenuOpen((v) => !v)}
-              className="w-9 h-9 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center hover:opacity-90 transition"
-            >
-              {initial}
-            </button>
-            {menuOpen && (
-              <div className="absolute right-0 mt-2 w-44 bg-white border rounded-xl shadow-lg py-1 z-50">
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    openUserProfile();
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                >
-                  Manage account
-                </button>
-                <button
-                  onClick={() => {
-                    setMenuOpen(false);
-                    signOut();
-                  }}
-                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
-                >
-                  Sign out
-                </button>
-              </div>
+        <div className="flex gap-5 items-center">
+          <div className="hidden md:block">
+            {!user ? (
+              <SignInButton mode="modal">
+                <Button>Get Started</Button>
+              </SignInButton>
+            ) : (
+              <Link href={"/create-new-trip"}>
+                <Button>Create New trip</Button>
+              </Link>
             )}
           </div>
-        )}
+
+          {user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                className="w-9 h-9 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center hover:opacity-90 transition"
+              >
+                {initial}
+              </button>
+              {menuOpen && (
+                <div className="absolute right-0 mt-2 w-64 bg-white border rounded-xl shadow-lg py-2 z-50">
+                  <div className="flex items-center gap-3 px-4 py-2">
+                    <div className="w-10 h-10 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center shrink-0">
+                      {initial}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold truncate">
+                        {user?.fullName || user?.username}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.primaryEmailAddress?.emailAddress}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="md:hidden border-t my-1">
+                    {menuOptions.map((menu, index) => (
+                      <Link
+                        href={menu.path}
+                        key={index}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        <h2 className="px-4 py-2 text-sm hover:bg-gray-100">
+                          {menu.name}
+                        </h2>
+                      </Link>
+                    ))}
+                    <Link
+                      href={"/create-new-trip"}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      <h2 className="px-4 py-2 text-sm hover:bg-gray-100">
+                        Create New trip
+                      </h2>
+                    </Link>
+                  </div>
+
+                  <div className="border-t my-1">
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        openUserProfile();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Manage account
+                    </button>
+                    <button
+                      onClick={() => {
+                        setMenuOpen(false);
+                        signOut();
+                      }}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              className="md:hidden p-2"
+              onClick={() => setMobileNavOpen((v) => !v)}
+            >
+              {mobileNavOpen ? (
+                <X className="h-6 w-6" />
+              ) : (
+                <Menu className="h-6 w-6" />
+              )}
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Mobile menu panel */}
-      {mobileNavOpen && (
+      {/* Mobile menu panel (signed-out users only) */}
+      {!user && mobileNavOpen && (
         <div className="md:hidden flex flex-col gap-4 mt-4 pb-2">
           {menuOptions.map((menu, index) => (
             <Link
@@ -133,42 +176,9 @@ function Header() {
               <h2 className="text-lg hover:text-primary">{menu.name}</h2>
             </Link>
           ))}
-          {!user ? (
-            <SignInButton mode="modal">
-              <Button className="w-full">Get Started</Button>
-            </SignInButton>
-          ) : (
-            <>
-              <Link href={"/create-new-trip"} onClick={() => setMobileNavOpen(false)}>
-                <Button className="w-full">Create New trip</Button>
-              </Link>
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center shrink-0">
-                  {initial}
-                </div>
-                <div className="flex flex-col gap-1">
-                  <button
-                    onClick={() => {
-                      setMobileNavOpen(false);
-                      openUserProfile();
-                    }}
-                    className="text-left text-sm hover:text-primary"
-                  >
-                    Manage account
-                  </button>
-                  <button
-                    onClick={() => {
-                      setMobileNavOpen(false);
-                      signOut();
-                    }}
-                    className="text-left text-sm hover:text-primary"
-                  >
-                    Sign out
-                  </button>
-                </div>
-              </div>
-            </>
-          )}
+          <SignInButton mode="modal">
+            <Button className="w-full">Get Started</Button>
+          </SignInButton>
         </div>
       )}
     </div>
