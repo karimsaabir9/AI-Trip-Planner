@@ -174,11 +174,11 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
 
   return (
     <div className="h-[85vh] flex flex-col border shadow rounded-2xl p-5">
-      {messages?.length == 0 && (
-        <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />
-      )}
       {/* Display Messages */}
-      <section className="flex-1 overflow-y-auto p-4">
+      <section className="flex-1 min-h-0 overflow-y-auto p-4">
+        {messages?.length == 0 && (
+          <EmptyBoxState onSelectOption={(v: string) => onSend(v)} />
+        )}
         {messages.map((msg: Message, index) => {
           if (msg.role == "user") {
             return (

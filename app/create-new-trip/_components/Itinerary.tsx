@@ -1,22 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import { Timeline } from "@/components/ui/timeline";
-import {
-  ArrowLeft,
-  Clock,
-  ExternalLink,
-  Star,
-  Ticket,
-  Timer,
-  Wallet,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import HotelCardItem from "./HotelCardItem";
 import PlaceCardItem from "./PlaceCardItem";
 import { useTripDetail } from "@/app/Provider";
-import { useEffect, useState } from "react";
-import { TripInfo } from "./ChatBox";
 
 // const TRIP_DATA = {
 //   budget: "Moderate",
@@ -187,33 +175,28 @@ import { TripInfo } from "./ChatBox";
 
 function Itinerary() {
   const { tripDetailInfo } = useTripDetail() || {};
-  const [tripData, setTripData] = useState<TripInfo | null>(null);
 
-  useEffect(() => {
-    tripDetailInfo && setTripData(tripDetailInfo);
-  }, [tripDetailInfo]);
-
-  const data = tripData
+  const data = tripDetailInfo
     ? [
         {
           title: "Recommended Hotels",
           content: (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {tripData?.hotels.map((hotel, index) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {tripDetailInfo.hotels.map((hotel, index) => (
                 <HotelCardItem key={index} hotel={hotel} />
               ))}
             </div>
           ),
         },
 
-        ...tripData?.itinerary.map((dayData) => ({
+        ...tripDetailInfo.itinerary.map((dayData) => ({
           title: `Day ${dayData?.day}`,
           content: (
             <div>
               <p className="mb-2 font-bold text-xl text-primary">
                 Best Time :{dayData?.best_time_to_visit_day}
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {dayData?.activities?.map((activity, index) => (
                   <PlaceCardItem key={index} activity={activity} />
                 ))}
@@ -225,9 +208,8 @@ function Itinerary() {
     : [];
   return (
     <div className="relative w-full h-[83vh] overflow-auto ">
-      {/* @ts-ignore */}
-      {tripData ? (
-        <Timeline data={data} tripData={tripData} />
+      {tripDetailInfo ? (
+        <Timeline data={data} tripData={tripDetailInfo} />
       ) : (
         <div>
           <h2 className="flex gap-2 items-center absolute bottom-5 left-5 text-3xl text-white">

@@ -35,7 +35,7 @@ function PlaceCardItem({activity}: Props) {
       width={400}
       height={200}
       alt={activity.place_name}
-      className="rounded-xl object-cover"
+      className="rounded-xl object-cover w-full aspect-[2/1] h-auto"
     />
     <h2 className="font-semibold text-lg">
       {activity?.place_name}

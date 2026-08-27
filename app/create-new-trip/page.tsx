@@ -9,7 +9,7 @@ function CreateNewTrip() {
   const [showTrip, setShowTrip] = useState(false);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 p-10">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 p-10">
       <div>
         <ChatBox
           onTripReady={setTripPlan}

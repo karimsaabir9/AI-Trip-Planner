@@ -4,6 +4,7 @@ import { SignInButton, useClerk, useUser } from "@clerk/nextjs";
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 const menuOptions = [
@@ -27,6 +28,9 @@ function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const path = usePathname();
+  console.log(path);
 
   const initial = (
     user?.firstName ||
@@ -73,6 +77,10 @@ function Header() {
               <SignInButton mode="modal">
                 <Button>Get Started</Button>
               </SignInButton>
+            ) : path === "/create-new-trip" ? (
+              <Link href={"/my-trips"}>
+                <Button>My Trips</Button>
+              </Link>
             ) : (
               <Link href={"/create-new-trip"}>
                 <Button>Create New trip</Button>
@@ -152,7 +160,9 @@ function Header() {
           <button
             className="md:hidden w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 active:scale-95 transition"
             onClick={() => setMobileNavOpen((v) => !v)}
-            aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-label={
+              mobileNavOpen ? "Close navigation menu" : "Open navigation menu"
+            }
             aria-haspopup="true"
             aria-expanded={mobileNavOpen}
           >
@@ -185,6 +195,13 @@ function Header() {
             <SignInButton mode="modal">
               <Button className="w-full">Get Started</Button>
             </SignInButton>
+          ) : path == "/create-new-trip" ? (
+            <Link
+              href={"/my-trips"}
+              onClick={() => setMobileNavOpen(false)}
+            >
+              <Button className="w-full">My Trips</Button>
+            </Link>
           ) : (
             <Link
               href={"/create-new-trip"}

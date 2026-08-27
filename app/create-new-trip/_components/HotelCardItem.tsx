@@ -30,16 +30,16 @@ function HotelCardItem({ hotel }: Props) {
   };
 
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-1 h-full">
       <Image
         src={photoUrl ? photoUrl : "/placeholders/hotel.jpg"}
         alt={"place-image"}
         width={400}
         height={200}
-        className="rounded-xl shadow object-cover"
+        className="rounded-xl shadow object-cover w-full aspect-[2/1] h-auto"
       />
-      <h2 className="font-semibold text-lg">{hotel?.hotel_name}</h2>
-      <h2 className="text-gray-500">{hotel.hotel_address}</h2>
+      <h2 className="font-semibold text-lg line-clamp-2">{hotel?.hotel_name}</h2>
+      <h2 className="text-gray-500 line-clamp-2">{hotel.hotel_address}</h2>
       <div className="flex justify-between items-center">
         <p className="flex gap-2 text-green-600">
           <Wallet /> {hotel.price_per_night}
@@ -53,8 +53,9 @@ function HotelCardItem({ hotel }: Props) {
           "https://www.google.com/maps/search/?api=1&query=" + hotel?.hotel_name
         }
         target="_blank"
+        className="mt-auto pt-1"
       >
-        <Button variant={"outline"} className="mt-1 w-full">
+        <Button variant={"outline"} className="w-full">
           View
         </Button>
       </Link>
