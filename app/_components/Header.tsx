@@ -67,7 +67,7 @@ function Header() {
           ))}
         </div>
 
-        <div className="flex gap-5 items-center">
+        <div className="flex gap-3 sm:gap-5 items-center">
           <div className="hidden md:block">
             {!user ? (
               <SignInButton mode="modal">
@@ -81,15 +81,33 @@ function Header() {
           </div>
 
           {user && (
-            <div className="relative" ref={menuRef}>
-              <button
-                onClick={() => setMenuOpen((v) => !v)}
-                className="w-9 h-9 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center hover:opacity-90 transition"
-              >
-                {initial}
-              </button>
-              {menuOpen && (
-                <div className="absolute right-0 mt-2 w-64 bg-white border rounded-xl shadow-lg py-2 z-50">
+            <>
+              {/* Visual separator between site navigation and account controls */}
+              <div
+                className="md:hidden w-px h-6 bg-gray-200"
+                aria-hidden="true"
+              />
+
+              <div className="relative" ref={menuRef}>
+                <button
+                  onClick={() => setMenuOpen((v) => !v)}
+                  aria-label="Open user account menu"
+                  aria-haspopup="true"
+                  aria-expanded={menuOpen}
+                  className="w-11 h-11 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center hover:opacity-90 active:scale-95 transition"
+                >
+                  {initial}
+                </button>
+
+                <div
+                  role="menu"
+                  aria-label="User account"
+                  className={`absolute right-0 mt-2 w-64 bg-white border rounded-xl shadow-lg py-2 z-50 origin-top-right transition duration-150 ease-out ${
+                    menuOpen
+                      ? "opacity-100 scale-100"
+                      : "opacity-0 scale-95 pointer-events-none"
+                  }`}
+                >
                   <div className="flex items-center gap-3 px-4 py-2">
                     <div className="w-10 h-10 rounded-full bg-purple-600 text-white font-semibold flex items-center justify-center shrink-0">
                       {initial}
@@ -106,6 +124,7 @@ function Header() {
 
                   <div className="border-t my-1">
                     <button
+                      role="menuitem"
                       onClick={() => {
                         setMenuOpen(false);
                         openUserProfile();
@@ -115,6 +134,7 @@ function Header() {
                       Manage account
                     </button>
                     <button
+                      role="menuitem"
                       onClick={() => {
                         setMenuOpen(false);
                         signOut();
@@ -125,13 +145,16 @@ function Header() {
                     </button>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            </>
           )}
 
           <button
-            className="md:hidden p-2"
+            className="md:hidden w-11 h-11 flex items-center justify-center rounded-full hover:bg-gray-100 active:scale-95 transition"
             onClick={() => setMobileNavOpen((v) => !v)}
+            aria-label={mobileNavOpen ? "Close navigation menu" : "Open navigation menu"}
+            aria-haspopup="true"
+            aria-expanded={mobileNavOpen}
           >
             {mobileNavOpen ? (
               <X className="h-6 w-6" />
@@ -143,8 +166,12 @@ function Header() {
       </div>
 
       {/* Mobile nav panel */}
-      {mobileNavOpen && (
-        <div className="md:hidden flex flex-col gap-4 mt-4 pb-2">
+      <div
+        className={`md:hidden overflow-hidden transition-all duration-200 ease-in-out ${
+          mobileNavOpen ? "max-h-96 opacity-100 mt-4" : "max-h-0 opacity-0"
+        }`}
+      >
+        <div className="flex flex-col gap-4 pb-2">
           {menuOptions.map((menu, index) => (
             <Link
               href={menu.path}
@@ -167,7 +194,7 @@ function Header() {
             </Link>
           )}
         </div>
-      )}
+      </div>
     </div>
   );
 }
