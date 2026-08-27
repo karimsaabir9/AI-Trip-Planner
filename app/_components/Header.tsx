@@ -31,7 +31,7 @@ function Header() {
   const initial = (
     user?.firstName ||
     user?.fullName ||
-    user?.username ||
+    user?.primaryEmailAddress?.emailAddress?.split("@")[0] ||
     "U"
   )
     .charAt(0)
