@@ -3,7 +3,11 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
 
-function SelectDaysUi({ onSelectedOption }: any) {
+type Props = {
+  onSelectedOption: (value: string) => void;
+};
+
+function SelectDaysUi({ onSelectedOption }: Props) {
   const [days, setDays] = useState<number>(3);
 
   return (

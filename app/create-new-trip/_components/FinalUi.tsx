@@ -1,7 +1,12 @@
 import { Button } from "@/components/ui/button";
 import { Globe2 } from "lucide-react";
 
-function FinalUi({ viewTrip, disable }: any) {
+type Props = {
+  viewTrip: () => void;
+  disable?: boolean;
+};
+
+function FinalUi({ viewTrip, disable }: Props) {
   return (
     <div className="flex flex-col items-center justify-center mt-6 p-6 bg-white rounded-2xl shadow border">
       <Globe2 className="text-primary text-4xl animate-bounce" />

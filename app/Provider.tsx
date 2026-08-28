@@ -7,16 +7,13 @@ import { useContext, useEffect, useState } from "react";
 import { UserDetailContext } from "@/context/UserDetailContext";
 import { TripContextType, TripDetailContext } from "@/context/TripDetailContext";
 import { TripInfo } from "./create-new-trip/_components/ChatBox";
+import { Doc } from "@/convex/_generated/dataModel";
 
 const Provider = ({ children }: { children: React.ReactNode }) => {
   const CreateUser = useMutation(api.user.CreateNewUser);
-  const [userDetail, setUserDetail] = useState<any>();
+  const [userDetail, setUserDetail] = useState<Doc<"UserTable"> | null>();
   const [tripDetailInfo, setTripDetailInfo] = useState<TripInfo | null>(null);
   const { user } = useUser();
-
-  useEffect(() => {
-    user && CreateNewUser();
-  }, [user]);
 
   const CreateNewUser = async () => {
     if (user) {
@@ -29,6 +26,11 @@ const Provider = ({ children }: { children: React.ReactNode }) => {
       setUserDetail(result);
     }
   };
+
+  useEffect(() => {
+    user && CreateNewUser();
+  }, [user]);
+
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
       <TripDetailContext.Provider value={{tripDetailInfo, setTripDetailInfo}}>

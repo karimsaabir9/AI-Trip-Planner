@@ -24,7 +24,11 @@ export const SelectBudgetOptions = [
   },
 ];
 
-function BudgetUi({ onSelectedOption }: any) {
+type Props = {
+  onSelectedOption: (value: string) => void;
+};
+
+function BudgetUi({ onSelectedOption }: Props) {
   return (
     <div className="grid grid-cols-3 md:grid-cols-3 gap-2 items-center mt-1">
       {SelectBudgetOptions.map((item, index) => (

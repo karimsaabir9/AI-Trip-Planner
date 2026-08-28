@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
-import { aj } from "../arcjet/route";
+import { aj } from "@/lib/arcjet";
 import { auth, currentUser } from "@clerk/nextjs/server";
 
 
@@ -96,6 +96,9 @@ Important: Prefer real, well-known, easily-recognizable hotels and points of int
 export async function POST(req: NextRequest) {
   const { messages, isFinal, answeredFields } = await req.json();
   const user = await currentUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   const {has} = await auth();
   const hasPremiumAccess = has({ plan: 'monthly' })
   console.log('hasPremiumAccess', hasPremiumAccess)

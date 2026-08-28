@@ -1,3 +1,11 @@
-import { createContext } from "react";
+import { Doc } from "@/convex/_generated/dataModel";
+import { createContext, Dispatch, SetStateAction } from "react";
 
-export const UserDetailContext = createContext<any>(null);
+export type UserDetailContextType = {
+  userDetail: Doc<"UserTable"> | null | undefined;
+  setUserDetail: Dispatch<SetStateAction<Doc<"UserTable"> | null | undefined>>;
+};
+
+export const UserDetailContext = createContext<UserDetailContextType | undefined>(
+  undefined
+);

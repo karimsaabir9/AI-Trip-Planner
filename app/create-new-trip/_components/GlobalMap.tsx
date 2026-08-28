@@ -59,12 +59,28 @@ function GlobalMap() {
     };
   }, [tripDetailInfo]);
 
+  useEffect(() => {
+    if (!mapContainerRef.current) return;
+
+    // Mapbox sizes its canvas from the container's dimensions at
+    // construction time only; without this it stays stuck at whatever size
+    // the container happened to be on first render (e.g. a stale/squished
+    // canvas after switching between the stacked-mobile and side-by-side
+    // desktop layouts, or any other container resize).
+    const resizeObserver = new ResizeObserver(() => {
+      mapRef.current?.resize();
+    });
+    resizeObserver.observe(mapContainerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
   return (
     <div>
       <div
         ref={mapContainerRef}
+        className="w-full lg:w-[95%]"
         style={{
-          width: "95%",
           height: "85vh",
           borderRadius: 20,
         }}

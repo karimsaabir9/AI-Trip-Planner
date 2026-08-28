@@ -13,20 +13,24 @@ type Props = {
 function PlaceCardItem({activity}: Props) {
   const [photoUrl, setPhotoUrl] = useState<string>("");
 
+  const GetPlaceImage = async () => {
+    try {
+      const result = await axios.post("/api/hotel-image", {
+        hotelName: activity?.place_name,
+        location: activity?.place_address,
+      });
+      if (!result?.data || result?.data?.error) {
+        return;
+      }
+      setPhotoUrl(result?.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     activity && GetPlaceImage();
   }, [activity]);
-
-  const GetPlaceImage = async () => {
-    const result = await axios.post("/api/hotel-image", {
-      hotelName: activity?.place_name,
-      location: activity?.place_address,
-    });
-    if (!result?.data || result?.data?.error) {
-      return;
-    }
-    setPhotoUrl(result?.data);
-  };
 
   return (
     <div >

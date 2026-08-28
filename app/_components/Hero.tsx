@@ -1,10 +1,12 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { HeroVideoDialog } from "@/components/ui/hero-video-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useUser } from "@clerk/nextjs";
-import { ArrowDown, Globe2, Landmark, Plane, Send } from "lucide-react";
+import { Globe2, Landmark, Plane, Send } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+export const PENDING_TRIP_PROMPT_KEY = "pendingTripPrompt";
 
 export const suggestions = [
   {
@@ -30,10 +32,15 @@ export const suggestions = [
 const Hero = () => {
   const { user } = useUser();
   const router = useRouter();
+  const [prompt, setPrompt] = useState("");
+
   const onSend = () => {
     if (!user) {
       router.push("/sign-in");
       return;
+    }
+    if (prompt.trim()) {
+      localStorage.setItem(PENDING_TRIP_PROMPT_KEY, prompt.trim());
     }
     //Navigate to Create Trip Planner Web Page
     router.push("/create-new-trip");
@@ -57,6 +64,8 @@ const Hero = () => {
             <Textarea
               placeholder="Create a trip for Paris from New York"
               className="w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none"
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
             />
             <Button
               size={"icon"}
@@ -73,6 +82,7 @@ const Hero = () => {
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
+              onClick={() => setPrompt(suggestion.title)}
               className="group flex items-center gap-2 border rounded-full p-2 cursor-pointer hover:bg-primary hover:text-white"
             >
               {suggestion.icon}
@@ -81,20 +91,6 @@ const Hero = () => {
           ))}
         </div>
 
-        <div className="flex items-center justify-center flex-col">
-          <h2 className="my-7 mt-14 flex gap-2 text-center">
-            Not Sure where to start? <strong>See how it works</strong>
-            <ArrowDown />
-          </h2>
-          {/* Video Section */}
-          <HeroVideoDialog
-            className="block dark:hidden"
-            animationStyle="from-center"
-            videoSrc="https://www.example.com/dummy-video"
-            thumbnailSrc="https://mma.prnewswire.com/media/2401528/1_MindtripProduct.jpg?p=facebook"
-            thumbnailAlt="Dummy Video Thumbnail"
-          />
-        </div>
       </div>
     </div>
   );

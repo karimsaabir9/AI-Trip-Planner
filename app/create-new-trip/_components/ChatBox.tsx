@@ -3,7 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import axios from "axios";
 import { Loader, Send } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { PENDING_TRIP_PROMPT_KEY } from "@/app/_components/Hero";
 import EmptyBoxState from "./EmptyBoxState";
 import GroupSizeUi from "./GroupSizeUi";
 import BudgetUi from "./BudgetUi";
@@ -96,8 +98,8 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
   const [isFinal, setIsFinal] = useState<boolean>(false);
   const [tripDetail, setTripDetail] = useState<TripInfo>();
   const SaveTripDetail = useMutation(api.tripDetail.CreateTripDetail);
-  const { userDetail } = useUserDetail();
-  const { tripDetailInfo, setTripDetailInfo } = useTripDetail() || {};
+  const { userDetail } = useUserDetail() || {};
+  const { setTripDetailInfo } = useTripDetail() || {};
 
   const onSend = async (input?: string, finalOverride?: boolean) => {
     const text = input ?? userInput;
@@ -111,36 +113,79 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
     };
     setMessages((prev: Message[]) => [...prev, newMsg]);
     const updatedMessages = [...messages, newMsg];
-    const result = await axios.post("/api/aimodel", {
-      messages: updatedMessages,
-      isFinal: useFinal,
-      answeredFields: getAnsweredFields(updatedMessages),
-    });
-    console.log("Trip", result.data);
-    !useFinal &&
+
+    try {
+      const result = await axios.post("/api/aimodel", {
+        messages: updatedMessages,
+        isFinal: useFinal,
+        answeredFields: getAnsweredFields(updatedMessages),
+      });
+
+      if (result?.data?.error) {
+        setMessages((prev: Message[]) => [
+          ...prev,
+          {
+            role: "assistant",
+            content:
+              result.data.error === "Unauthorized"
+                ? "Please sign in to continue planning your trip."
+                : "Something went wrong. Please try again.",
+          },
+        ]);
+        return;
+      }
+
+      if (!useFinal) {
+        setMessages((prev: Message[]) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: result?.data?.resp,
+            ui: result?.data?.ui,
+          },
+        ]);
+      }
+
+      if (!useFinal && result?.data?.ui === "final") {
+        setIsFinal(true);
+        await onSend("Ok, Great!", true);
+        return;
+      }
+
+      if (useFinal) {
+        setTripDetail(result?.data?.trip_plan);
+        setTripDetailInfo?.(result?.data?.trip_plan);
+        onTripReady?.(result?.data?.trip_plan);
+        if (userDetail) {
+          const tripId = uuidv4();
+          await SaveTripDetail({
+            tripDetail: result?.data?.trip_plan,
+            tripId: tripId,
+          });
+        }
+      }
+    } catch (e) {
+      console.log(e);
       setMessages((prev: Message[]) => [
         ...prev,
         {
           role: "assistant",
-          content: result?.data?.resp,
-          ui: result?.data?.ui,
+          content: "Something went wrong. Please try again.",
         },
       ]);
-
-    if (useFinal) {
-      setTripDetail(result?.data?.trip_plan);
-      setTripDetailInfo?.(result?.data?.trip_plan);
-      onTripReady?.(result?.data?.trip_plan);
-      const tripId = uuidv4();
-      await SaveTripDetail({
-        tripDetail: result?.data?.trip_plan,
-        tripId: tripId,
-        uid: userDetail?._id,
-      });
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
+
+  useEffect(() => {
+    const pendingPrompt = localStorage.getItem(PENDING_TRIP_PROMPT_KEY);
+    if (pendingPrompt) {
+      localStorage.removeItem(PENDING_TRIP_PROMPT_KEY);
+      onSend(pendingPrompt);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const RenderGenerativeUi = (ui: string, index: number) => {
     const uiKey = ui?.toLowerCase();
@@ -160,17 +205,16 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
     } else if (uiKey == "final") {
       //Final Trip UI Component
       return <FinalUi viewTrip={() => onViewTrip?.()} disable={!tripDetail} />;
+    } else if (uiKey == "limit") {
+      //Daily Free Limit Reached
+      return (
+        <Link href="/pricing" className="mt-2 block">
+          <Button size="sm">Upgrade to keep planning</Button>
+        </Link>
+      );
     }
     return null;
   };
-
-  useEffect(() => {
-    const lastMsg = messages[messages.length - 1];
-    if (lastMsg?.ui == "final") {
-      setIsFinal(true);
-      onSend("Ok, Great!", true);
-    }
-  }, [messages]);
 
   return (
     <div className="h-[85vh] flex flex-col border shadow rounded-2xl p-5">

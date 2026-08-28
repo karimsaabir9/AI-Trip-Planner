@@ -1,6 +1,10 @@
 import { suggestions } from "@/app/_components/Hero";
 
-function EmptyBoxState({onSelectOption}:any) {
+type Props = {
+  onSelectOption: (value: string) => void;
+};
+
+function EmptyBoxState({ onSelectOption }: Props) {
   return (
     <div className="mt-2">
       <h2 className="font-bold text-xl lg:text-2xl text-center">

@@ -14,26 +14,30 @@ type Props = {
 function HotelCardItem({ hotel }: Props) {
   const [photoUrl, setPhotoUrl] = useState<string>("");
 
+  const GetHotelImage = async () => {
+    try {
+      const result = await axios.post("/api/hotel-image", {
+        hotelName: hotel?.hotel_name,
+        location: hotel?.hotel_address,
+      });
+      if (!result?.data || result?.data?.error) {
+        return;
+      }
+      setPhotoUrl(result?.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
   useEffect(() => {
     hotel && GetHotelImage();
   }, [hotel]);
-
-  const GetHotelImage = async () => {
-    const result = await axios.post("/api/hotel-image", {
-      hotelName: hotel?.hotel_name,
-      location: hotel?.hotel_address,
-    });
-    if (!result?.data || result?.data?.error) {
-      return;
-    }
-    setPhotoUrl(result?.data);
-  };
 
   return (
     <div className="flex flex-col gap-1 h-full">
       <Image
         src={photoUrl ? photoUrl : "/placeholders/hotel.jpg"}
-        alt={"place-image"}
+        alt={`${hotel?.hotel_name ?? "Hotel"} photo`}
         width={400}
         height={200}
         className="rounded-xl shadow object-cover w-full aspect-[2/1] h-auto"

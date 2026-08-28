@@ -1,6 +1,7 @@
 "use client"; 
 
 import React from "react";
+import Image from "next/image";
 import { Carousel, Card } from "@/components/ui/apple-cards-carousel";
 
 export function PopularCityList() {
@@ -30,11 +31,11 @@ const DestinationContent = ({
       <p className="text-neutral-600 text-base md:text-2xl font-sans max-w-3xl mx-auto">
         {description}
       </p>
-      <img
+      <Image
         src={src}
         alt={description}
-        height="500"
-        width="500"
+        height={500}
+        width={500}
         className="md:w-1/2 md:h-1/2 h-full w-full mx-auto object-contain rounded-2xl mt-8"
       />
     </div>

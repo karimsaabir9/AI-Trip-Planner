@@ -1,4 +1,3 @@
-import { div } from "motion/react-client";
 import React from "react";
 
 export const SelectTravelesList = [
@@ -35,7 +34,11 @@ export const SelectTravelesList = [
   },
 ];
 
-function GroupSizeUi({ onSelectedOption }: any) {
+type Props = {
+  onSelectedOption: (value: string) => void;
+};
+
+function GroupSizeUi({ onSelectedOption }: Props) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 items-center mt-1">
       {SelectTravelesList.map((item, index) => (

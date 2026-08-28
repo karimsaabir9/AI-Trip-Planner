@@ -10,10 +10,6 @@ const footerLinks = [
     name: "Pricing",
     path: "/pricing",
   },
-  {
-    name: "Contact us",
-    path: "/contact-us",
-  },
 ];
 
 function Footer() {
