@@ -11,6 +11,7 @@ import GroupSizeUi from "./GroupSizeUi";
 import BudgetUi from "./BudgetUi";
 import SelectDaysUi from "./SelectDaysUi";
 import FinalUi from "./FinalUi";
+import MarkdownRenderer from "@/components/ui/markdown-renderer";
 import { useMutation } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { useTripDetail, useUserDetail } from "@/app/Provider";
@@ -237,9 +238,9 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
           return (
             <div key={index} className="flex justify-start mt-2">
               <div
-                className={`${generativeUi ? "w-full" : ""} max-w-lg bg-gray-100 text-black px-4 py-2 rounded-lg`}
+                className={`${generativeUi ? "w-full" : "max-w-[85%] sm:max-w-lg"} bg-gray-100 text-black px-4 py-2 rounded-lg`}
               >
-                {msg.content}
+                <MarkdownRenderer content={msg.content} />
                 {generativeUi}
               </div>
             </div>
@@ -259,12 +260,19 @@ function ChatBox({ onTripReady, onViewTrip }: ChatBoxProps) {
           placeholder="Start typing here..."
           className="w-full h-28 bg-transparent border-none focus-visible:ring-0 shadow-none resize-none"
           onChange={(e) => setUserInput(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              if (!loading) onSend();
+            }
+          }}
           value={userInput}
         />
         <Button
           size={"icon"}
           className="absolute bottom-3 right-3 shadow-md"
           onClick={() => onSend()}
+          disabled={loading}
         >
           <Send className="h-4 w-4" />
         </Button>

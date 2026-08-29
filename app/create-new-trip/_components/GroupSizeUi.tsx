@@ -1,11 +1,17 @@
-import React from "react";
+import { Home, HeartHandshake, PartyPopper, User, type LucideIcon } from "lucide-react";
 
-export const SelectTravelesList = [
+export const SelectTravelesList: {
+  id: number;
+  title: string;
+  desc: string;
+  icon: LucideIcon;
+  people: string;
+}[] = [
   {
     id: 1,
     title: "Just Me",
     desc: "A sole traveles in exploration",
-    icon: "✈️",
+    icon: User,
     people: "1",
   },
 
@@ -13,7 +19,7 @@ export const SelectTravelesList = [
     id: 2,
     title: "A Couple",
     desc: "Two traveles in tandem",
-    icon: "🥂",
+    icon: HeartHandshake,
     people: "2 People",
   },
 
@@ -21,7 +27,7 @@ export const SelectTravelesList = [
     id: 3,
     title: "Family",
     desc: "A group of fun loving adv",
-    icon: "🏡",
+    icon: Home,
     people: "3 to 5 People",
   },
 
@@ -29,7 +35,7 @@ export const SelectTravelesList = [
     id: 4,
     title: "Friends",
     desc: "A bunch of thrill-seekes",
-    icon: "⛵",
+    icon: PartyPopper,
     people: "5 to 10 People",
   },
 ];
@@ -44,10 +50,12 @@ function GroupSizeUi({ onSelectedOption }: Props) {
       {SelectTravelesList.map((item, index) => (
         <div
           key={index}
-          className="p-3 border rounded-2xl bg-white hover:border-primary cursor-pointer"
+          className="h-24 flex flex-col items-center justify-center text-center p-3 border rounded-2xl bg-white hover:border-primary cursor-pointer"
           onClick={() => onSelectedOption(item.title + ":" + item.people)}
         >
-          <h2>{item.icon}</h2>
+          <h2 className="mb-1">
+            <item.icon className="h-5 w-5" strokeWidth={1.75} />
+          </h2>
           <h2>{item.title}</h2>
         </div>
       ))}

@@ -1,9 +1,17 @@
-export const SelectBudgetOptions = [
+import { Wallet, Banknote, Gem, type LucideIcon } from "lucide-react";
+
+export const SelectBudgetOptions: {
+  id: number;
+  title: string;
+  desc: string;
+  icon: LucideIcon;
+  color: string;
+}[] = [
   {
     id: 1,
     title: "Cheap",
     desc: "Stay conscious of costs",
-    icon: "💵",
+    icon: Wallet,
     color: "bg-green-100 text-green-600",
   },
 
@@ -11,7 +19,7 @@ export const SelectBudgetOptions = [
     id: 2,
     title: "Moderate",
     desc: "Keep cost on the average side",
-    icon: "💰",
+    icon: Banknote,
     color: "bg-yellow-100 text-yellow-600",
   },
 
@@ -19,7 +27,7 @@ export const SelectBudgetOptions = [
     id: 3,
     title: "Luxury",
     desc: "Don't worry about cost",
-    icon: "💸",
+    icon: Gem,
     color: "bg-purple-100 text-purple-600",
   },
 ];
@@ -34,10 +42,12 @@ function BudgetUi({ onSelectedOption }: Props) {
       {SelectBudgetOptions.map((item, index) => (
         <div
           key={index}
-          className="p-3 border rounded-2xl bg-white hover:border-primary cursor-pointer flex flex-col items-center text-center"
+          className="h-44 p-3 border rounded-2xl bg-white hover:border-primary cursor-pointer flex flex-col items-center justify-center text-center"
           onClick={() => onSelectedOption(item.title + ":" + item.desc)}
         >
-          <div className={`text-3xl p-3 rounded-full ${item.color}`}>{item.icon}</div>
+          <div className={`p-3 rounded-full ${item.color}`}>
+            <item.icon className="h-7 w-7" strokeWidth={1.75} />
+          </div>
           <h2 className=" text-lg font-semibold mt-2">{item.title}</h2>
           <p className="text-sm text-gray-500">{item.desc}</p>
         </div>
