@@ -6,7 +6,7 @@ Built with the Next.js App Router, Convex, Clerk, Mapbox, and the OpenAI API.
 
 ## Features
 
-- **Conversational trip builder** — a chat interface collects trip details one question at a time and renders purpose-built UI (budget, group size, day count) inline with the conversation.
+- **Conversational trip builder** — a chat interface collects trip details one question at a time and renders purpose-built UI (budget, group size, day count) inline with the conversation, with assistant replies rendered as formatted Markdown (headings, lists, bold/italic) instead of raw text.
 - **AI-generated itineraries** — once all details are collected, the planner produces a structured day-by-day plan with hotel recommendations, activities, ticket pricing, and best times to visit.
 - **Interactive globe map** — every hotel and activity is plotted with a marker on a Mapbox 3D globe, with a one-click toggle between the map view and the itinerary view.
 - **Real destination photography** — hotel and place images are resolved through Pexels and Wikimedia Commons (with relevance and licensing checks), never generic stock placeholders.
@@ -21,6 +21,7 @@ Built with the Next.js App Router, Convex, Clerk, Mapbox, and the OpenAI API.
 |---|---|
 | Framework | [Next.js](https://nextjs.org) (App Router) + React 19 |
 | Styling | Tailwind CSS v4, shadcn/ui, Tabler & Lucide icons |
+| Content rendering | react-markdown + remark-gfm (GitHub-flavored Markdown) |
 | Auth | [Clerk](https://clerk.com) |
 | Database | [Convex](https://convex.dev) |
 | AI | OpenAI Chat Completions API |
@@ -42,6 +43,9 @@ app/
 │   └── hotel-image/           # Pexels/Wikimedia image resolution endpoint
 ├── _components/               # Shared layout components (Header, Hero, Footer)
 └── Provider.tsx               # Convex, user, and trip-detail context providers
+
+components/ui/
+└── markdown-renderer.tsx       # Styled Markdown renderer used for AI chat replies
 
 convex/
 ├── schema.ts                  # Database schema (users, trip details)
